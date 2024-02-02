@@ -9,15 +9,6 @@ def wrap_labels(labels, wrap_length):
     return {key: textwrap.fill(value, wrap_length) for key, value in labels.items()}
 
 def calculate_victors(csv_data):
-    """
-    Calculates the victors for games, sets, and matches within the provided csv data.
-
-    Args:
-        csv_data (list of dicts): The CSV data with match information.
-
-    Returns:
-        list of dicts: The CSV data updated with 'game_victor', 'set_victor', and 'match_victor' keys.
-    """
     for match_id in {item['match_id'] for item in csv_data}:
         match_data = [item for item in csv_data if item['match_id'] == match_id]
 
@@ -70,7 +61,7 @@ def calculate_victors(csv_data):
 
 # Call the function with your data
 csv_data = calculate_victors(csv_data)
-print(csv_data)
+# print(csv_data)
 
 def draw_tennis_match_network(data):
     G = nx.DiGraph()  # 使用有向图
@@ -98,7 +89,7 @@ def draw_tennis_match_network(data):
 
     # 绘制边标签，并调整标签位置以防止重叠
     edge_labels = nx.get_edge_attributes(G, 'label')
-    label_pos = 0.4  # 标签位置在边的中间
+    label_pos = 0.3  # 标签位置在边的中间
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8, label_pos=label_pos)
 
     plt.show()
