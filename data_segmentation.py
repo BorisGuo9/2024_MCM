@@ -1,15 +1,3 @@
-# import pytesseract
-# from PIL import Image
-
-# # Load the image from file
-# img = Image.open("data/seg.png")
-
-# # Use tesseract to do OCR on the image
-# text = pytesseract.image_to_string(img)
-# file_path = "data/extracted_text.txt"
-
-# with open(file_path, "w") as file:
-#     file.write(text)
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
