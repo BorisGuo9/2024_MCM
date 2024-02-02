@@ -1,4 +1,5 @@
 import csv
+import os
 from typing import List, Dict
 import matplotlib.pyplot as plt
 
@@ -97,26 +98,53 @@ new_data = clean_data(csv_data)
 for row in new_data[5:10]:  # 注意，列表索引从0开始
     print(row)
     
-# def plot_time_series_for_matches(data, font='Times New Roman'):
-#     # Group data by match
-#     matches = {}
-#     for item in data:
-#         match_id = item['identifier'].split('-')[0:2]  # Extracting round and match number
-#         match_key = '-'.join(match_id)
-#         if match_key not in matches:
-#             matches[match_key] = []
-#         matches[match_key].append(item['time'])
 
-#     # Plotting each match
-#     for match, times in matches.items():
-#         plt.figure(figsize=(10, 6))
-#         plt.plot(times, marker='o')
-#         plt.xlabel('Point Number', fontsize=14, fontname=font)
-#         plt.ylabel('Elapsed Time (seconds)', fontsize=14, fontname=font)
-#         plt.title(f'Time Series for Match {match}', fontsize=16, fontname=font)
-#         plt.xticks(range(len(times)), fontsize=12, fontname=font)
-#         plt.yticks(fontsize=12, fontname=font)
-#         plt.grid(True)
-#         plt.show()
+def plot_match_time_series(data, font='Times New Roman', point_size=2, save_dir='figures'):
+    r"""Plots time series for each match with 'point' as the y-axis and saves the figures.
+
+    Args:
+        data (List[Dict[str, any]]): The processed list of dictionaries containing identifiers and time.
+        font (str): The font family to use for text in the plot.
+        point_size (int): The size of the points in the plot.
+        save_dir (str): Directory to save the figures.
+    """
+    # Create save directory if it doesn't exist
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Group data by match
+    matches = {}
+    for item in data:
+        match_id = item['identifier'].split('-')[0:2]  # Extracting round and match number
+        match_key = '-'.join(match_id)
+        if match_key not in matches:
+            matches[match_key] = []
+        matches[match_key].append(item)
+
+    # Plotting each match
+    for match, items in matches.items():
+        plt.figure(figsize=(12, 8))  # Increased figure size for better readability
+        times = [item['time'] for item in items]
+        points = [int(item['identifier'].split('-')[-1]) for item in items]
+
+        # Calculate label intervals
+        x_label_interval = max(1, (max(times) - min(times)) // 10)
+        y_label_interval = max(1, (max(points) - min(points)) // 10)
+
+        plt.plot(times, points, marker='o', markersize=point_size, linestyle='-')
+        plt.xlabel('Elapsed Time (seconds)', fontsize=14, fontname=font)
+        plt.ylabel('Point', fontsize=14, fontname=font)
+        plt.title(f'Time Series for Match {match}', fontsize=16, fontname=font)
+
+        # Set x-axis and y-axis labels with dynamic intervals
+        plt.xticks(range(min(times), max(times) + 1, x_label_interval), fontsize=12, fontname=font)
+        plt.yticks(range(min(points), max(points) + 1, y_label_interval), fontsize=10, fontname=font)
         
-# plot_time_series_for_matches(new_data)
+        plt.grid(True)
+        plt.tight_layout()
+
+        # Save the figure
+        plt.savefig(os.path.join(save_dir, f'time_series_{match}.png'))
+        plt.close()
+        
+plot_match_time_series(new_data)
