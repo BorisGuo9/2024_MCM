@@ -1,5 +1,6 @@
 import csv
 from typing import List, Dict
+import matplotlib.pyplot as plt
 
 def parse_match_id(match_id: str) -> (int, int):
     parts = match_id.split('-')
@@ -19,7 +20,7 @@ def parse_boolean(value: str) -> bool:
     return value == '1'
 
 def parse_shot_type(shot: str) -> str:
-    return 'Backhand' if shot == 'B' else 'Forehand' if shot == 'F' else shot
+    return 'Backhand' if shot == 'B' else 'Forehand' if shot == 'F' else None
 
 def parse_speed(speed_str: str) -> int:
     return None if speed_str == 'NA' else int(speed_str)
@@ -77,6 +78,45 @@ def read_csv_to_dict(file_path: str) -> List[Dict[str, str]]:
 
 # Use the function with your CSV file path
 csv_data = read_csv_to_dict('data/Wimbledon_featured_matches.csv')
-for row in csv_data[4:5]:  # 注意，列表索引从0开始
-    print(row)
+# for row in csv_data[3:4]:  # 注意，列表索引从0开始
+#     print(row)
 
+def clean_data(data: List[Dict[str, any]]) -> List[Dict[str, any]]:
+    processed_list = []
+    for row in data:
+        identifier = f"{row['round_no']}-{row['match_no']}-{row['set_no']}-{row['game_no']}-{row['point_no']}"
+        new_entry = {
+            'identifier': identifier,
+            'time': row['elapsed_time']
+        }
+        processed_list.append(new_entry)
+
+    return processed_list
+
+new_data = clean_data(csv_data)
+for row in new_data[5:10]:  # 注意，列表索引从0开始
+    print(row)
+    
+# def plot_time_series_for_matches(data, font='Times New Roman'):
+#     # Group data by match
+#     matches = {}
+#     for item in data:
+#         match_id = item['identifier'].split('-')[0:2]  # Extracting round and match number
+#         match_key = '-'.join(match_id)
+#         if match_key not in matches:
+#             matches[match_key] = []
+#         matches[match_key].append(item['time'])
+
+#     # Plotting each match
+#     for match, times in matches.items():
+#         plt.figure(figsize=(10, 6))
+#         plt.plot(times, marker='o')
+#         plt.xlabel('Point Number', fontsize=14, fontname=font)
+#         plt.ylabel('Elapsed Time (seconds)', fontsize=14, fontname=font)
+#         plt.title(f'Time Series for Match {match}', fontsize=16, fontname=font)
+#         plt.xticks(range(len(times)), fontsize=12, fontname=font)
+#         plt.yticks(fontsize=12, fontname=font)
+#         plt.grid(True)
+#         plt.show()
+        
+# plot_time_series_for_matches(new_data)
