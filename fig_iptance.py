@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Load the CSV file
-file_path = 'data/Feature Importance.csv'  # Replace with your actual file path
+file_path = 'data/importance_values_split.csv'  # Replace with your actual file path
 data = pd.read_csv(file_path)
 
 # Define the annotations for the labels
@@ -47,20 +47,23 @@ bars = plt.barh(labels, values, color=[colors(i) for i in range(len(labels))])
 # Add the data values on the bars
 for idx, bar in enumerate(bars):
     plt.text(bar.get_width(), bar.get_y() + bar.get_height()/2,
-             f'{bar.get_width():.2f}',
-             va='center', ha='left')
+         f'{bar.get_width():.2f}',
+         va='center', ha='left', fontname='Times New Roman')
 
-plt.xlabel('Values')
-plt.ylabel('Features')
-plt.title('Horizontal Bar Chart of Features')
-plt.xticks()
-plt.yticks()
+plt.xlabel('Values', fontname='Times New Roman')
+plt.ylabel('Features', fontname='Times New Roman')
+plt.title('Feature Performance importance of split', fontname='Times New Roman')
+
+plt.xticks(fontname='Times New Roman')
+plt.yticks(fontname='Times New Roman')
 
 # Create a legend
 patch_list = [plt.Rectangle((0,0),1,1, color=colors(i), label=f'{label}: {feature_annotations[label]}') 
               for i, label in enumerate(labels)]
-plt.legend(handles=patch_list, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize='small')
+plt.legend(handles=patch_list, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., 
+           fontsize='small', prop={'family': 'Times New Roman'})
 
 # Show the plot with a legend
 plt.tight_layout()
-plt.show()
+plt.savefig('figures/important_split.png', dpi=300, bbox_inches='tight')
+# plt.show()
