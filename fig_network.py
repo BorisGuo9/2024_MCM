@@ -94,4 +94,4 @@ def draw_tennis_match_network(data):
 
     plt.show()
 
-draw_tennis_match_network(csv_data)
+# draw_tennis_match_network(csv_data)
