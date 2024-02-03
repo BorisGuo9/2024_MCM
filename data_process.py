@@ -99,8 +99,8 @@ def clean_data(data: List[Dict[str, any]]) -> List[Dict[str, any]]:
     return processed_list
 
 new_data = clean_data(csv_data)
-for row in new_data[5:10]:  # 注意，列表索引从0开始
-    print(row)
+# for row in new_data[5:10]:  # 注意，列表索引从0开始
+#     print(row)
     
 
 def plot_match_time_series(data, font='Times New Roman', point_size=2, save_dir='figures'):
