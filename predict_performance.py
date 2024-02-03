@@ -1,8 +1,20 @@
+# import pytesseract
+# from PIL import Image
+
+# # Load the image from file
+# img = Image.open("data/seg.png")
+
+# # Use tesseract to do OCR on the image
+# text = pytesseract.image_to_string(img)
+# file_path = "data/extracted_text.txt"
+
+# with open(file_path, "w") as file:
+#     file.write(text)
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
-df = pd.read_csv("data/Wimbledon_featured_matches.csv")
+df = pd.read_csv("data/match_2023-wimbledon-1701.csv")
 df.loc[(df.p1_score=='AD'),'p1_score'] = 50
 df.loc[(df.p2_score=='AD'),'p2_score'] = 50
 # df.loc[(df.speed_mph=='NA'),'speed_mph'] = 0
@@ -79,5 +91,5 @@ columns = dataset.columns[:-1]
 # print(columns)
 scaler.fit(dataset[columns].values)
 dataset[columns] = scaler.transform(dataset[columns].values)
-dataset.to_csv("Standard dataset.csv",index=False)
+dataset.to_csv("Standard predict performance.csv",index=False)
 # dataset.to_excel("Standard dataset.xlsx",index=False)
