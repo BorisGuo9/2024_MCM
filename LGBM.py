@@ -4,17 +4,15 @@ import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import GridSearchCV
 import matplotlib.pyplot as plt
 
 # 准备数据（示例数据）
 # 请替换成你自己的数据
-df = pd.read_csv('Standard dataset.csv')
-X = df[['x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12','x13','x14','x15','x16','x17']]
+data = pd.read_csv('Standard dataset.csv')
+X = data[['x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12','x13','x14','x15','x16','x17']]
 x = np.array(X)
 # print(x)
-y = df['labels']
+y = data['labels']
 
 
 
@@ -66,24 +64,22 @@ print(f'Classification Report:\n{report}')
 
 bst.save_model('model.txt')
 bst = lgb.Booster(model_file='model.txt')
-bt = bst.feature_importance()
-# plt.plot(bt)
-print(bt)
-# plt.show()
-# lgb.plot_importance(bst, importance_type="gain", figsize=(7,6), title="LightGBM Feature Importance (Gain)")
-# plt.show()
+bt_feature = bst.feature_importance()
+bt_feature = pd.DataFrame(bt_feature)
+bt_feature.to_csv("Feature Importance.csv",index=False)
 
 
-
-
-
-
-df = pd.read_csv('Standard predict performance.csv')
-X = df[['x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12','x13','x14','x15','x16','x17']]
+data = pd.read_csv('Standard predict performance.csv')
+X = data[['x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12','x13','x14','x15','x16','x17']]
 x = np.array(X)
 # print(x)
-y = df['labels']
+y = data['labels']
 ypred = bst.predict(x)
+ypred = pd.DataFrame(ypred)
+ypred.to_csv("Predicted Performance.csv",index=False)
+
+
+
 print(ypred[0])
 plt.plot(ypred)
 plt.title('Performance Score of the player')
@@ -92,10 +88,4 @@ plt.ylabel('Score')
 plt.legend()
 plt.show()
 
-# plt.figure(figsize=(12, 6))
-# plt.plot(y_pred, label='Predicted Probability', color='skyblue')
-# plt.title('Predicted Probability of Test Samples')
-# plt.xlabel('Sample Index')
-# plt.ylabel('Probability')
-# plt.legend()
-# plt.show()
+
