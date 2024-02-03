@@ -19,8 +19,8 @@ def update(frac=0.05):
     plt.plot(lowess_fitted[:, 0], lowess_fitted[:, 1], label='LOWESS Smoothed Curve', color='green')
     
     plt.xlabel('Point', fontproperties=times_font)
-    plt.ylabel('Win Rate', fontproperties=times_font)
-    plt.title('Win Rate vs Point with LOWESS Smoothed Curve', fontproperties=times_font)
+    plt.ylabel('Score', fontproperties=times_font)
+    plt.title('Performance score of the player', fontproperties=times_font)
     plt.legend(prop=times_font)
     
     plt.show()
