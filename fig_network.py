@@ -2,10 +2,22 @@ from data_process import read_csv_to_dict
 import matplotlib.pyplot as plt
 import networkx as nx
 import textwrap
-import pandas as pd
+import csv
+import os
 
-csv_data = read_csv_to_dict('data/match_2023-wimbledon-1701.csv')
+csv_data = read_csv_to_dict('data/Wimbledon_featured_matches.csv')
 # print(csv_data)
+
+def invert_point_victor(data_list):
+    for data in data_list:
+        if 'point_victor' in data:
+            data['point_victor'] = 2 if data['point_victor'] == 1 else 1 if data['point_victor'] == 2 else data['point_victor']
+        else:
+            raise KeyError("Key 'point_victor' not found in one of the dictionaries.")
+    return data_list
+
+csv_data = invert_point_victor(csv_data)
+
 def wrap_labels(labels, wrap_length):
     return {key: textwrap.fill(value, wrap_length) for key, value in labels.items()}
 
@@ -63,8 +75,44 @@ def calculate_victors(csv_data):
 # Call the function with your data
 csv_data = calculate_victors(csv_data)
 # print(csv_data)
-df = pd.DataFrame(csv_data)
-df.to_csv("17301 dataset.csv",index=False)
+
+def save_to_csv(data, filename):
+    r"""Saves given data to a CSV file, creating directory if it doesn't exist.
+
+    This function checks if the directory of the given filename exists, and if not,
+    creates it. Then, it writes the data to a CSV file specified by the filename.
+
+    Args:
+        data (list of dict): The data to be written to the CSV file.
+        filename (str): The path to the CSV file.
+
+    Raises:
+        IOError: If writing to the file fails.
+    """
+    # 创建文件所在目录（如果目录不存在）
+    directory = os.path.dirname(filename)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # 尝试写入数据到 CSV 文件
+    try:
+        with open(filename, 'w', newline='') as csvfile:
+            # 假设所有字典有相同的键，用第一个字典的键作为列标题
+            fieldnames = data[0].keys()
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            writer.writeheader()
+            for row in data:
+                writer.writerow(row)
+    except IOError as e:
+        raise IOError(f"Error writing to file {filename}: {e}")
+
+# # 指定 CSV 文件的名称
+# filename = 'data/invert_Wimbledon.csv'
+
+# save_to_csv(csv_data, filename)
+
+# print(f"数据已保存到 {filename}")
 
 def draw_tennis_match_network(data):
     G = nx.DiGraph()  # 使用有向图

@@ -77,7 +77,7 @@ def read_csv_to_dict(file_path: str) -> List[Dict[str, str]]:
             processed_data.append(row)
         return processed_data
 
-# Use the function with your CSV file path
+
 csv_data = read_csv_to_dict('data/Wimbledon_featured_matches.csv')
 # for row in csv_data[3:4]:  # 注意，列表索引从0开始
 #     print(row)
@@ -87,7 +87,11 @@ def clean_data(data: List[Dict[str, any]]) -> List[Dict[str, any]]:
     for row in data:
         identifier = f"{row['round_no']}-{row['match_no']}-{row['set_no']}-{row['game_no']}-{row['point_no']}"
         new_entry = {
-            'identifier': identifier,
+            # 'identifier': identifier,
+            'match_id': '-'.join(identifier.split('-')[0:2]),
+            # 'point_all': identifier.split('-')[4],
+            'point_p1': row['p1_points_won'],
+            'point_p2': row['p2_points_won'],
             'time': row['elapsed_time']
         }
         processed_list.append(new_entry)
@@ -95,8 +99,8 @@ def clean_data(data: List[Dict[str, any]]) -> List[Dict[str, any]]:
     return processed_list
 
 new_data = clean_data(csv_data)
-for row in new_data[5:10]:  # 注意，列表索引从0开始
-    print(row)
+# for row in new_data[5:10]:  # 注意，列表索引从0开始
+#     print(row)
     
 
 def plot_match_time_series(data, font='Times New Roman', point_size=2, save_dir='figures'):
@@ -147,4 +151,47 @@ def plot_match_time_series(data, font='Times New Roman', point_size=2, save_dir=
         plt.savefig(os.path.join(save_dir, f'time_series_{match}.png'))
         plt.close()
         
-plot_match_time_series(new_data)
+# plot_match_time_series(new_data)
+
+def plot_match_trends(data, font='Times New Roman', save_dir='figures'):
+    r"""Plots the match trends using a multiple line chart and saves the figures.
+
+    Args:
+        data (List[Dict[str, any]]): The processed list of dictionaries containing match data.
+        font (str): The font family to use for text in the plot.
+        save_dir (str): Directory to save the figures.
+    """
+    # Create save directory if it doesn't exist
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # Group data by match
+    matches = {}
+    for item in data:
+        match_id = item['match_id']
+        if match_id not in matches:
+            matches[match_id] = {'time': [], 'point_p1': [], 'point_p2': []}
+        matches[match_id]['time'].append(item['time'])
+        matches[match_id]['point_p1'].append(item['point_p1'])
+        matches[match_id]['point_p2'].append(item['point_p2'])
+
+    # Plotting each match
+    for match, points in matches.items():
+        plt.figure(figsize=(10, 6))
+        plt.plot(points['time'], points['point_p1'], label='Player 1', marker='o')
+        plt.plot(points['time'], points['point_p2'], label='Player 2', marker='o')
+        plt.xlabel('Elapsed Time (seconds)', fontsize=14, fontname=font)
+        plt.ylabel('Points', fontsize=14, fontname=font)
+        plt.title(f'Match Trend for {match}', fontsize=16, fontname=font)
+        plt.legend(fontsize=12)
+        plt.xticks(fontsize=12, fontname=font)
+        plt.yticks(fontsize=12, fontname=font)
+        plt.grid(True)
+        plt.tight_layout()
+
+        # Save the figure
+        plt.savefig(os.path.join(save_dir, f'match_trend_{match}.png'))
+        plt.close()
+
+
+# plot_match_trends(new_data)
