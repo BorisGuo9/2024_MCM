@@ -1,0 +1,44 @@
+x1_ls,x2_ls,x3_ls,x4_ls,x5_ls,x6_ls,x7_ls,x8_ls,x9_ls,x1@_ls,x11_ls,\
+x12_ls,x13_ls,x14_1s,x15_1s,x16_ls=[],[],(],01,01,01,01,01,01,01,01,01,01,01,01,01
+label_ls = []
+
+for match_id, set_no, game_no,point_no in zip(df.match_id,df.set_no,df.game_no,df.point_no):
+
+match = df[df.match_i
+
+set_ = match[match.set_ni et_no]
+game_ = set_[set_.game_no==game_no]
+point_ = game_{game =point_no]
+
+x1 = point_['p1_games'].values[@]
+x2 = point_['pi_score'].values[@] - point_['p2_score'].values[@]
+
+x3 = 1 if point_['serve_no'].values[@] == 1 else 0
+
+x4 @ if x2<@ else 1
+
+x5 = point_['pl_sets'].values[@] - point_['p2_sets'].values[0)
+
+x6 = 1 if 1 in game_['p1_ace'].values else 0
+
+x7 = 1 if 1 in game_['p1_winner'].values else 0
+
+x8 = 1 if 1 in game_['p1_double_fault'].values else 0
+
+x9 = 1 af 1 in game_[{'p1_unf_err'].values else 0
+
+x10 = game_['p1_net_pt_won'].sum()/game_['p1_net_pt'].sum() if game_['pi_net_pt'].sum()!= 0 else 0
+x11 = set_['p1_break_pt_won'].sum()/set_['p1_break_pt'].sum() if game_['p1_break_pt'].sum()!= @ else 0
+
+index = match. index.tolist() .index(point_.index.tolist()[@]
+
+x12 = match. iloc[ :index+1]['p1_distance_run'].sum(
+
+x13 = match. iloc[index-2:index+1]['p1_distance_run'].sum(
+x14 = point_['p1_distance_run'].values[@]
+
+x15 = point_['speed_mph'].values[@]
+
+x16 = x15*x3
+
+RAM Ff AK __AP.,. fee. | oe
