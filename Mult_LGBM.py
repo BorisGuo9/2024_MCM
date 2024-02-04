@@ -8,10 +8,12 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 from sklearn.metrics import roc_curve, auc
+from statsmodels.nonparametric.smoothers_lowess import lowess
+from sklearn.preprocessing import MinMaxScaler
 
 # 准备数据（示例数据）
 # 请替换成你自己的数据
-data = pd.read_csv('Standard dataset.csv')
+data = pd.read_csv('data_processed/Standard dataset_2.csv')
 X = data[['x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12','x13','x14','x15','x16','x17']]
 x = np.array(X)
 # print(x.shape)
@@ -58,14 +60,19 @@ bst_point = lgb.train(params, train_data, num_round, valid_sets=[test_data],
 x18 = bst_point.predict(x, num_iteration=bst_point.best_iteration) 
 x18 = np.array(x18)
 x18 = x18.reshape(-1, 1)  # 将x18转换为一维数组
+# print(x18)
+# lowessed_point = lowess(np.arange(len(x18)), x18, frac = 0.05)
+# lowessed_point = lowessed_point[:, 1]
+# lowessed_point = np.array(lowessed_point)
+# lowessed_point = lowessed_point.reshape(-1,1)
 # print(np.shape(x))
 # print(np.shape(x18))
-x = np.hstack((x, x18))
+# x = np.hstack((x, lowessed_point))
 # print(np.shape(x))
-
+x = np.hstack((x, x18))
 
 # print(x)
-data_labels = pd.read_csv('Wimbledon_with_victor_labels_2.csv')
+data_labels = pd.read_csv('data_processed/Wimbledon_with_victor_labels_2.csv')
 # for row in range(0,data_labels.shape[0]):
 #     if data_labels['game_victor'] == 2:
 #         data_labels['game_vicotr'] = 0
@@ -95,8 +102,19 @@ bst_game = lgb.train(params, train_data, num_round, valid_sets=[test_data],
 
 # Set Model
 x19 = bst_game.predict(x, num_iteration=bst_game.best_iteration) 
+# lowessed_game = lowess(np.arange(len(x19)), x19, frac = 0.1)
+# lowessed_game = lowessed_game[:, 1]
+# print(lowessed_game)
+
+# lowessed_game = np.array(lowessed_game)
+# lowessed_game = lowessed_game.reshape(-1,1)
 x19 = np.array(x19)
 x19 = x19.reshape(-1, 1)  # 将x18转换为一维数组
+# x = np.hstack((x, lowessed_game))
+# plt.figure()
+# plt.plot(x19[1:100])
+# plt.show()
+
 x = np.hstack((x, x19))
 
 
@@ -120,6 +138,13 @@ bst_set = lgb.train(params, train_data, num_round, valid_sets=[test_data],
 
 # Match Model
 x20 = bst_set.predict(x, num_iteration=bst_set.best_iteration) 
+# lowessed_set = lowess(np.arange(len(x20)), x20, frac = 0.01)
+# lowessed_set = lowessed_set[:, 1]
+# lowessed_set = np.array(lowessed_set)
+# lowessed_set = lowessed_set.reshape(-1,1)
+
+# x = np.hstack((x,lowessed_set))
+
 # print(x20)
 x20 = np.array(x20)
 x20 = x20.reshape(-1, 1)  # 将x18转换为一维数组
@@ -156,6 +181,45 @@ print(f'Classification Report:\n{report}')
 
 
 
+
+
+# 预测温网的一场比赛
+single_match = pd.read_csv('Standard match_2023-wimbledon-1701_labels.csv')
+X = single_match[['x1','x2','x3','x4','x5','x6','x7','x8','x9','x10','x11','x12','x13','x14','x15','x16','x17']]
+x = np.array(X)
+single_match = pd.read_csv('match_2023-wimbledon-1701_labels.csv')
+x18 = single_match['game_victor']
+x19 = single_match['set_victor']
+x20 = single_match['match_victor']
+x18 = np.array(x18)
+x19 = np.array(x19)
+x20 = np.array(x20)
+x18 = x18.reshape(-1, 1) 
+x19 = x19.reshape(-1, 1)
+x20 = x20.reshape(-1, 1) # 将x18转换为一维数组
+# x = np.hstack((x, x18))
+x = np.hstack((x, x18,x19,x20))
+y_predicted = bst_match.predict(x, num_iteration=bst_match.best_iteration)
+lowessed_set = lowess(np.arange(len(y_predicted)), y_predicted, frac = 0.2)
+lowessed_set = lowessed_set[:, 1]
+# lowessed_set = np.array(lowessed_set)
+
+# 创建一个MinMaxScaler对象
+scaler = MinMaxScaler()
+
+# 将lowessed_set进行归一化
+normalized_set = scaler.fit_transform(lowessed_set.reshape(-1, 1))
+# los = pd.DataFrame(lowessed_set)
+# los.to_csv('lowessed_set.csv')
+
+plt.figure()
+plt.plot(normalized_set)
+# plt.plot(y_pred)
+plt.show()
+
+
+# 结果作图
+
 importance_values_gain = bst_match.feature_importance(importance_type='gain')
 importance_values_split = bst_match.feature_importance(importance_type='split')
 
@@ -164,11 +228,6 @@ dataset.to_csv('importance_values_gain of Multi_LGBM',index = False)
 
 dataset = pd.DataFrame(importance_values_split)
 dataset.to_csv('importance_values_split of Multi_LGBM',index = False)
-
-
-
-
-
 
 
 conf_mat = confusion_matrix(y_test, y_pred_binary)
@@ -191,4 +250,5 @@ plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic (ROC) Curve')
 plt.legend(loc="lower right")
 plt.show()
+
 
