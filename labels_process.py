@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from fig_network import save_to_csv
 
-data = pd.read_csv("data/Wimbledon_featured_matches.csv")
+data = pd.read_csv("data/Wimbledon_with_victor_labels.csv")
 data.loc[(data.serve_depth=='CTL'),'serve_depth'] = 1
 data.loc[(data.serve_depth=='NCTL'),'serve_depth'] = 0
 data.loc[(data.return_depth=='D'),'return_depth'] = 1
@@ -50,8 +50,8 @@ def invert_tennis_scores(data):
         temp_p1_sets, temp_p2_sets = point['p1_sets'], point['p2_sets']
 
         # Reverse point_victor
-        # point_victor_reversed = 3 - point['point_victor']
-        point_victor_reversed = point['point_victor']
+        point_victor_reversed = 3 - point['point_victor']
+        # point_victor_reversed = point['point_victor']
 
         # Update temporary points won
         if point_victor_reversed == 1:
@@ -88,9 +88,9 @@ def invert_tennis_scores(data):
             match_victor = 1 if temp_p1_sets > temp_p2_sets else 2
 
         # Update the point data with temporary victor values
-        # point['point_victor'] = point_victor_reversed
-        # point['game_victor'] = game_victor
-        # point['set_victor'] = set_victor
+        point['point_victor'] = point_victor_reversed
+        point['game_victor'] = game_victor
+        point['set_victor'] = set_victor
         point['match_victor'] = match_victor
 
     return data
@@ -99,7 +99,8 @@ data = invert_tennis_scores(data)
 # for row in data[3:4]:  
 #     print(row)
 # 指定 CSV 文件的名称
-filename = 'data/truth_Wimbledon.csv'
+# filename = 'data/truth_Wimbledon.csv'
+filename = 'data/invert_Wimbledon.csv'
 
 save_to_csv(data, filename)
 
