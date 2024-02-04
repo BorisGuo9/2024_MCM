@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
 # 对原始数据进行替换、筛选
-data = pd.read_csv("data/Wimbledon_featured_matches_victor_labels.csv")
+data = pd.read_csv("data_processed/Wimbledon_with_victor_labels_2.csv")
 data.loc[(data.serve_depth=='CTL'),'serve_depth'] = 1
 data.loc[(data.serve_depth=='NCTL'),'serve_depth'] = 0
 data.loc[(data.return_depth=='D'),'return_depth'] = 1
@@ -60,6 +60,9 @@ for match_id, setno, gameno,pointno in zip(data.match_id,data.set_no,data.game_n
     # x17发球或回球深度
     x17 = point['serve_depth'].values[0] * x3 + point['return_depth'].values[0] * (1 - x3)
 
+
+
+
     x1_l.append(x1)
     x2_l.append(x2)
     x3_l.append(x3)
@@ -86,5 +89,5 @@ columns = dataset.columns[:-1]
 # print(columns)
 Normalization.fit(dataset[columns].values)
 dataset[columns] = Normalization.transform(dataset[columns].values)
-dataset.to_csv("Standard dataset.csv",index=False)
+dataset.to_csv("Standard match_2023-wimbledon-1701_labels_2.csv",index=False)
 # dataset.to_excel("Standard dataset.xlsx",index=False)
