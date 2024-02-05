@@ -21,15 +21,15 @@ def find_last_of_consecutive_sequences(numbers):
 
 
 
-# A = np.array([[1,   1.33, 1.67, 2],  # match
-#               [0.75, 1,   1.33, 1.67],  # set
-#               [0.6,  0.75, 1,   1.33],  # game
-#               [0.5,  0.6,  0.75, 1]])   # point
+A = np.array([[1,   1.33, 1.67, 2],  # match
+              [0.75, 1,   1.33, 1.67],  # set
+              [0.6,  0.75, 1,   1.33],  # game
+              [0.5,  0.6,  0.75, 1]])   # point
 
-A = np.array([[1,   1.15, 1.3,  1.45],  # match
-              [0.87, 1,    1.15, 1.3],   # set
-              [0.77, 0.87, 1,    1.15],  # game
-              [0.69, 0.77, 0.87, 1]])    # point
+# A = np.array([[1,   1.33, 1.67,  2],  # match
+#               [0.6, 1,    1.15, 1.33],   # set
+#               [0.5, 0.87, 1,    1.15],  # game
+#               [0.75, 1.5, 1.2, 1]])    # point
 
 
 # Calculate the eigenvector and eigenvalues
@@ -49,19 +49,20 @@ print(weights)
 
 
 data = pd.read_csv('momentum_data/momentum of match_2023-wimbledon-1701.csv')
-match_data = pd.read_csv('data_positive/data_segment/match_2023-wimbledon-1306.csv')
+match_data = pd.read_csv('data_positive/data_segment/match_2023-wimbledon-1701.csv')
 
 # break_point segmentation
 break_point_rows = match_data[match_data['p1_break_pt'] == 1]
 break_points_ls = np.array(break_point_rows['point_no'])
-# print(np.array(break_point_rows['point_no']))
+break_points_ls = [x - 1 for x in break_points_ls]
 
-# Tiebreak_point
+# Tiebreak_point segmentation
 Tiebreak_point_rows = match_data[((match_data['p1_games'] == 6) & (match_data['p2_games'] == 6)) | ((match_data['p1_games'] == 9) & (match_data['p2_games'] == 9))]
 Tiebreak_point_ls = np.array(Tiebreak_point_rows['point_no'])
 # print(filtered_rows_ls)
-Tiebreak_point_ls = find_last_of_consecutive_sequences(Tiebreak_point_ls)
-# print(result)
+Tiebreak_point_ls = find_last_of_consecutive_sequences(Tiebreak_point_ls) 
+Tiebreak_point_ls = [x - 1 for x in Tiebreak_point_ls]
+
 
 
 
@@ -86,22 +87,18 @@ leverage = []
 
 for p in range(0, len(match_values)):
     if p in break_points_ls:
-        lev = match_values[p] * 0.1 + set_values[p] * 0.2 + game_values[p] * 0.2 +point_values[p] * 0.5
-    elif p in break_points_ls:
-        lev = match_values[p] * 0.1 + set_values[p] * 0.2 + game_values[p] * 0.2 +point_values[p] * 0.5
+        # lev = match_values[p] * 0.2 + set_values[p] * 0.2 + game_values[p] * 0.2 +point_values[p] * 0.4
+        lev = match_values[p] * 0 + set_values[p] * 0 + game_values[p] * 0 +point_values[p] * 1
+    elif p in Tiebreak_point_ls:
+        lev = match_values[p] * 0.01 + set_values[p] * 0.02 + game_values[p] * 0.02 +point_values[p] * 0.95
     else:
-        lev = match_values[p] * 0.25 + set_values[p] * 0.25 + game_values[p] * 0.25 +point_values[p] * 0.25
+        lev = match_values[p] * 0.3 + set_values[p] * 0.2 + game_values[p] * 0.2 +point_values[p] * 0.3
+        # lev = match_values[p] * 0.25 + set_values[p] * 0.25 + game_values[p] * 0.25 +point_values[p] * 0.25
     leverage.append(lev)
-
-
-
-
 
 # leverage = match_values * weights[0] + set_values * weights[2] + game_values * [3] +point_values*0.25 * [1]
 # leverage = match_values * 0.25 + set_values * 0.25 + game_values * 0.25 +point_values*0.25
 # leverage = match_values * 0.2 + set_values * 0.3 + game_values * 0.2 +point_values*0.3
-
-
 
 
 
@@ -142,14 +139,15 @@ df_2.to_csv('momentum.csv')
 # Plot the smoothed values
 plt.figure()
 
-plt.plot(leverage)
+# plt.plot(leverage)
 plt.plot(smoothed_values)
 
 # 在break points上添加红色散点
 for bp in break_points_ls:
     plt.scatter(bp, smoothed_values[bp], color='red')  # 'leverage[bp]' 获取该点的杠杆值
 
-# 在Tiebreak points上添加红色散点
+
+# 在Tiebreak points上添加蓝色散点
 for tbp in Tiebreak_point_ls:
     plt.scatter(tbp, smoothed_values[tbp], color='blue')  # 'leverage[bp]' 获取该点的杠杆值
 
