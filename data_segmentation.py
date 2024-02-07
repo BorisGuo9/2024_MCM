@@ -50,7 +50,7 @@ def process(csv_file):
         x11 = match.iloc[ :index+1]['p1_distance_run'].sum()
         #  x12为近三个points的总跑动里程
         x12 = match.iloc[index-2:index+1]['p1_distance_run'].sum()
-        #  x13为上一point的跑动里程
+        #  x13为当前point的跑动里程
         x13 = point['p1_distance_run'].values[0]
         #  x14球速
         x14 = point['speed_mph'].values[0]
@@ -58,9 +58,6 @@ def process(csv_file):
         x15 = point['rally_count'].values[0]
         # x16发球或回球深度
         x16 = point['serve_depth'].values[0] * x3 + point['return_depth'].values[0] * (1 - x3)
-
-
-
         x1_l.append(x1)
         x2_l.append(x2)
         x3_l.append(x3)

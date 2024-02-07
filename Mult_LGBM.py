@@ -273,20 +273,6 @@ def momentum_data(label_csv_file, standard_csv_file,output_folder):
     result_df = pd.concat([y_predicted_match_pos, y_predicted_set_pos, y_predicted_game_pos, y_predicted_point_pos,y_predicted_match_neg, y_predicted_set_neg, y_predicted_game_neg, y_predicted_point_neg], axis=1)
     result_df.to_csv(output_file_path, index=False)
     
-    # # 结果作图
-
-    # importance_values_gain = bst_match.feature_importance(importance_type='gain')
-    # importance_values_split = bst_match.feature_importance(importance_type='split')
-
-    # feature_names = ['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', 'x13', 'x14', 'x15', 'x16','x17','x18','x19']
-    # dataset = pd.DataFrame(importance_values_gain)
-    # dataset.to_csv('importance_values_gain of Multi_LGBM',index = False)
-
-    # dataset = pd.DataFrame(importance_values_split)
-    # dataset.to_csv('importance_values_split of Multi_LGBM',index = False)
-
-    # df_importance = pd.DataFrame({'Feature': feature_names, 'Gain Importance': importance_values_gain, 'Split Importance': importance_values_split})
-
 def process_all_csv_files(label_csvs_folder, standard_csvs_folder):
     # 遍历文件夹中的所有 CSV 文件
     output_folder = "momentum_data"
@@ -309,12 +295,23 @@ def process_all_csv_files(label_csvs_folder, standard_csvs_folder):
             momentum_data(label_csv_file, standard_csv_file,output_folder)
 
 # 调用处理所有 CSV 文件的函数，传入文件夹路径
-process_all_csv_files("data_segment", 'Standard_data')
+# process_all_csv_files("data_segment", 'Standard_data')
 
 
+# # 结果作图
 
+# importance_values_gain = bst_game.feature_importance(importance_type='gain')
+# importance_values_split = bst_game.feature_importance(importance_type='split')
 
-# 排序特征按照Gain Importance降序排列
+# feature_names = ['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', 'x13', 'x14', 'x15', 'x16','x17']
+# dataset = pd.DataFrame(importance_values_gain)
+# dataset.to_csv('importance_values_gain of Multi_LGBM',index = False)
+
+# dataset = pd.DataFrame(importance_values_split)
+# dataset.to_csv('importance_values_split of Multi_LGBM',index = False)
+
+# df_importance = pd.DataFrame({'Feature': feature_names, 'Gain Importance': importance_values_gain, 'Split Importance': importance_values_split})
+# # 排序特征按照Gain Importance降序排列
 # df_importance = df_importance.sort_values(by='Gain Importance', ascending=False)
 
 # plt.figure(figsize=(12, 6))
@@ -324,6 +321,106 @@ process_all_csv_files("data_segment", 'Standard_data')
 # plt.ylabel('Feature')
 # plt.show()
 
+# # 排序特征按照Gain Importance降序排列
+# df_importance = df_importance.sort_values(by='Split Importance', ascending=False)
+
+# plt.figure(figsize=(12, 6))
+# sns.barplot(x='Split Importance', y='Feature', data=df_importance, palette='viridis')
+# plt.title('Feature Importance (Split) - LightGBM Model')
+# plt.xlabel('Split Importance')
+# plt.ylabel('Feature')
+# plt.show()
+
+feature_annotations = {
+    "x_1": "Number of games lead in the set",
+    "x_2": "Scores lead in the current game",
+    "x_3": "Whether the player is serving",
+    "x_4": "Number of sets lead in the match",
+    "x_5": "Player 1's aces",
+    "x_6": "Player 1's winners",
+    "x_7": "Player 1's double faults",
+    "x_8": "Player 1's unforced errors",
+    "x_9": "Ratio of net points won to total net points",
+    "x_10": "Ratio of break points won to total break points",
+    "x_11": "Total running distance in the match",
+    "x_12": "Total running distance in the last three points",
+    "x_13": "Running distance in the last point",
+    "x_14": "Ball speed",
+    "x_15": "Number of hits per rally",
+    "x_16": "Serve or Return Depth",
+    "x_17": "Probability of winning the point",
+    "x_18": "Probability of winning the game",
+    "x_19": "Probability of winning the set"
+}
+labels = [f"x_{i+1}" for i in range(16)]
+
+importance_values_gain = bst_match.feature_importance(importance_type='gain')
+importance_values_split = bst_match.feature_importance(importance_type='split')
+
+feature_names = ['x1', 'x2', 'x3', 'x4', 'x5', 'x6', 'x7', 'x8', 'x9', 'x10', 'x11', 'x12', 'x13', 'x14', 'x15', 'x16','x17','x18','x19']
+
+# Create DataFrames for importance values
+df_importance_gain = pd.DataFrame({'Feature': feature_names, 'Gain Importance': importance_values_gain})
+df_importance_split = pd.DataFrame({'Feature': feature_names, 'Split Importance': importance_values_split})
+
+# Save importance values to CSV files
+df_importance_gain.to_csv('importance_values_gain_of_Multi_LGBM.csv', index=False)
+df_importance_split.to_csv('importance_values_split_of_Multi_LGBM.csv', index=False)
+
+# Sort features by Gain Importance
+df_importance_split = df_importance_split[:16]
+df_importance_gain = df_importance_gain[:16]
+df_importance_gain = df_importance_gain.sort_values(by='Gain Importance', ascending=False)
+
+print(df_importance_gain)
+
+plt.figure(figsize=(12, 6))
+ax = sns.barplot(x='Gain Importance', y='Feature', data=df_importance_gain, palette='viridis')
+plt.title('Feature Importance (Gain) - LightGBM Model')
+plt.xlabel('Gain Importance')
+plt.ylabel('Feature')
+
+# Add labels to the bars
+for p in ax.patches:
+    ax.annotate(f'{p.get_width():.2f}', (p.get_width(), p.get_y() + p.get_height() / 2),
+                ha='left', va='center', fontsize=10, color='black')
+colors = plt.cm.get_cmap('viridis', len(labels))
+
+patch_list = [plt.Rectangle((0,0),1,1, color=colors(i), label=f'{label}: {feature_annotations[label]}') 
+              for i, label in enumerate(labels)]
+plt.legend(handles=patch_list, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., 
+           fontsize='small', prop={'family': 'Times New Roman'})
+
+
+plt.tight_layout()
+plt.savefig('feature_importance_split_plot.png', dpi=300)
+plt.show()
+
+# Sort features by Split Importance
+df_importance_split = df_importance_split.sort_values(by='Split Importance', ascending=False)
+
+plt.figure(figsize=(12, 6))
+ax = sns.barplot(x='Split Importance', y='Feature', data=df_importance_split, palette='viridis')
+plt.title('Feature Importance (Split) - LightGBM Model')
+plt.xlabel('Split Importance')
+plt.ylabel('Feature')
+
+# Add labels to the bars
+for p in ax.patches:
+    ax.annotate(f'{p.get_width():.2f}', (p.get_width(), p.get_y() + p.get_height() / 2),
+                ha='left', va='center', fontsize=10, color='black')
+
+colors = plt.cm.get_cmap('viridis', len(labels))
+
+patch_list = [plt.Rectangle((0,0),1,1, color=colors(i), label=f'{label}: {feature_annotations[label]}') 
+              for i, label in enumerate(labels)]
+plt.legend(handles=patch_list, bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., 
+           fontsize='small', prop={'family': 'Times New Roman'})
+
+
+plt.tight_layout()
+plt.savefig('feature_importance_split_plot.png', dpi=300)
+plt.show()
 
 
 
