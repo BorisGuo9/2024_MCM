@@ -8,10 +8,11 @@ import numpy as np
 
 # Pairwise comparison matrix
 # match set  game point
-A = np.array([[1,   2,   4,   8],  # match
-              [0.5, 1,   2,   4],  # set
-              [0.25,0.5, 1,   2],  # game
-              [0.125,0.25,0.5, 1]])  # point
+
+A = np.array([[1,   1.33, 1.67, 2],  # match
+              [0.75, 1,   1.33, 1.67],  # set
+              [0.6,  0.75, 1,   1.33],  # game
+              [0.5,  0.6,  0.75, 1]])   # point
 
 # Calculate the eigenvector and eigenvalues
 eigenvalues, eigenvectors = np.linalg.eig(A)
